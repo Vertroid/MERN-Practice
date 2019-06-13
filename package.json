@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./server/server.js",
+    "auto": "nodemon -w ./server/server.js ./server/server.js",
     "debug": "node --debug-brk=3001 ./server/server.js",
     "compile": "babel src --presets react,es2015 --out-dir static",
     "watch": "babel src --presets react,es2015 --out-dir static --watch"
@@ -12,6 +13,7 @@
   "author": "Vertex",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "express": "^4.16.4"
   },
   "devDependencies": {
