@@ -1,30 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongo = require('mongodb').MongoClient;
 
 const app = express();
 app.use(express.static('static'));
 app.use(bodyParser.json());
 
-const issues = [
-    {
-        id: 1,
-        status: "open",
-        owner: "Vertex",
-        created: new Date('2018/6/30'),
-        completionDate: undefined,
-        effort: 5,
-        title: "Learning MERN pro stack"
-    },
-    {
-        id: 2,
-        status: "closed",
-        owner: "Zephyr",
-        created: new Date('2016/5/31'),
-        completionDate: new Date('2017/1/25'),
-        effort: 5,
-        title: "Learning Unity3D"
-    }
-]
+mongo.connect('mongodb://localhost/issuetracker', function(err, db){
+    db.collection('')
+})
 
 const validIssueStatus = {
     open: true,
