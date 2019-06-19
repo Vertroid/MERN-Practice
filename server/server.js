@@ -1,14 +1,21 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const mongo = require('mongodb').MongoClient;
+const MongoClient = require('mongodb').MongoClient;
+let db, dbo;
 
 const app = express();
 app.use(express.static('static'));
 app.use(bodyParser.json());
 
-mongo.connect('mongodb://localhost/issuetracker', function(err, db){
-    db.collection('')
-})
+MongoClient.connect('mongodb://localhost/issuetracker', {useNewUrlParser: true}).then(conn => {
+    db = conn;
+    dbo = db.db('issuetracker');
+    app.listen(3000, function(){
+        console.log('App started at port 3000');
+    });
+}).catch(err => {
+    console.log("Error while connecting DB: " + err);
+});
 
 const validIssueStatus = {
     open: true,
@@ -16,7 +23,6 @@ const validIssueStatus = {
 };
 
 const issueFieldType = {
-    id: 'required',
     status: 'required',
     owner: 'required',
     effort: 'optional',
@@ -42,18 +48,21 @@ function validateIssue(issue){
 }
 
 app.get('/api/issues', (req, res) => {
-    const metadata = {
-        total_count: issues.length
-    };
-    res.json({
-        _metadata: metadata,
-        records: issues
+    dbo.collection('issues').find().toArray().then(result => {
+        const metadata = {
+            total_count: result.length
+        };
+        res.json({
+            _metadata: metadata,
+            records: result
+        });
+    }).catch(err => {
+        console.log("Error while reading: " + err);
     });
 });
 
 app.post('/api/issues', (req, res) => {
     const newIssue = req.body;
-    newIssue.id = issues.length + 1;
     newIssue.created = new Date();
 
     if(!newIssue.status){
@@ -62,21 +71,26 @@ app.post('/api/issues', (req, res) => {
 
     // 验证
     const err = validateIssue(newIssue);
-    if(!err){
+    if(err){
         res.status(422).json({
-            message: `Invalid issue: ${err}`
+            message: `Invalid requset: ${err}`
         });
         return;
     }
-
-    issues.push(newIssue);
-    res.json(newIssue);
-
+    dbo.collection('issues').insertOne(newIssue).then(result => {
+        console.log(result);
+        return dbo.collection('issues').find({_id: result.insertedId}).limit(1).next();
+    }).then(row => {
+        res.json(row);
+    }).catch(err => {
+        console.log(err);
+        res.status(500).json({
+            message: `Internal server error: ${err}`
+        });
+    });
 })
 
-app.listen(3000, function(){
-    console.log('App started at port 3000');
-});
+
 
 
 

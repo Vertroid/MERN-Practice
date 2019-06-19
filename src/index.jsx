@@ -16,19 +16,26 @@ class IssueList extends React.Component{
         this.loadData();
     }
     loadData(){
-        fetch('/api/issues').then(response => 
-            response.json()
-        ).then(data => {
-            console.log("Total Count: " + data._metadata.total_count);
-            data.records.forEach(issue => {
-                issue.created = new Date(issue.created);
-                if(issue.completionDate){
-                    issue.completionDate = new Date(issue.completionDate);
-                }
-            });
-
-            // 这里的this会从上层寻找
-            this.setState({issues: data.records});
+        fetch('/api/issues').then(response => {
+            if(response.ok){
+                response.json().then(data => {
+                    console.log("Total Count: " + data._metadata.total_count);
+                    data.records.forEach(issue => {
+                        issue.created = new Date(issue.created);
+                        if(issue.completionDate){
+                        issue.completionDate = new Date(issue.completionDate);
+                        }
+                    });
+                    // 这里的this会从上层寻找
+                    this.setState({issues: data.records});
+                });
+            }else{
+                response.json().then(error => {
+                    console.log("Error while loading: " + error);
+                });
+            }
+        }).catch(error => {   
+            console.log("Error while loading: " + error);
         });
 
     };
@@ -118,7 +125,7 @@ class IssueAdd extends React.Component{
 // 改写为无状态组件
 const IssueRow = (props) => (
     <tr>
-        <td>{props.issue.id}</td>
+        <td>{props.issue._id}</td>
         <td>{props.issue.status}</td>
         <td>{props.issue.owner}</td>
         <td>{props.issue.created.toDateString()}</td>
@@ -130,7 +137,7 @@ const IssueRow = (props) => (
 
 // 改写为无状态组件
 function IssueTable(props){
-    const issueRows = props.issues.map(issue => <IssueRow key={issue.id} issue={issue}/>);
+    const issueRows = props.issues.map(issue => <IssueRow key={issue._id} issue={issue}/>);
     return(
         <table className="bordered-table">
             <thead>
