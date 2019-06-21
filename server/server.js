@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient;
+const Issue = require('./issue');
 let db, dbo;
 
 const app = express();
@@ -17,35 +18,7 @@ MongoClient.connect('mongodb://localhost/issuetracker', {useNewUrlParser: true})
     console.log("Error while connecting DB: " + err);
 });
 
-const validIssueStatus = {
-    open: true,
-    closed: true
-};
 
-const issueFieldType = {
-    status: 'required',
-    owner: 'required',
-    effort: 'optional',
-    created: 'required',
-    completionDate: 'optional',
-    title: 'required',
-}
-
-// 验证issue合法
-function validateIssue(issue){
-    for(const field in issueFieldType){
-        const type = issueFieldType[field];
-        if(!type){
-            delete issue[field]; // 删除issue中不需要的键
-        }else if(type === 'required' && !issue[field]){
-            return `${field} is required!`;
-        }
-    }
-
-    if(!validIssueStatus[issue.status]){
-        return `${issue.status} is not a valid status`;
-    }
-}
 
 app.get('/api/issues', (req, res) => {
     dbo.collection('issues').find().toArray().then(result => {
@@ -70,7 +43,7 @@ app.post('/api/issues', (req, res) => {
     }
 
     // 验证
-    const err = validateIssue(newIssue);
+    const err = Issue.validateIssue(newIssue);
     if(err){
         res.status(422).json({
             message: `Invalid requset: ${err}`

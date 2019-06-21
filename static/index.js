@@ -2,6 +2,12 @@
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _issueAdd = require('./issue-add.js');
+
+var _issueAdd2 = _interopRequireDefault(_issueAdd);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -109,7 +115,7 @@ var IssueList = function (_React$Component) {
                 React.createElement('hr', null),
                 React.createElement(IssueTable, { issues: this.state.issues }),
                 React.createElement('hr', null),
-                React.createElement(IssueAdd, { createIssue: this.createIssue }),
+                React.createElement(_issueAdd2.default, { createIssue: this.createIssue }),
                 React.createElement('hr', null)
             );
         }
@@ -139,55 +145,6 @@ var IssueFilter = function (_React$Component2) {
     }]);
 
     return IssueFilter;
-}(React.Component);
-
-var IssueAdd = function (_React$Component3) {
-    _inherits(IssueAdd, _React$Component3);
-
-    function IssueAdd() {
-        _classCallCheck(this, IssueAdd);
-
-        var _this5 = _possibleConstructorReturn(this, (IssueAdd.__proto__ || Object.getPrototypeOf(IssueAdd)).call(this));
-
-        _this5.handleSubmit = _this5.handleSubmit.bind(_this5);
-
-        return _this5;
-    }
-
-    _createClass(IssueAdd, [{
-        key: 'handleSubmit',
-        value: function handleSubmit(e) {
-            e.preventDefault();
-            var form = document.forms.issueAdd;
-            this.props.createIssue({
-                owner: form.owner.value,
-                title: form.title.value,
-                status: 'open',
-                created: new Date()
-            });
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            return React.createElement(
-                'div',
-                null,
-                React.createElement(
-                    'form',
-                    { name: 'issueAdd', onSubmit: this.handleSubmit },
-                    React.createElement('input', { type: 'text', name: 'owner', placeholder: 'Owner' }),
-                    React.createElement('input', { type: 'text', name: 'title', placeholder: 'title' }),
-                    React.createElement(
-                        'button',
-                        null,
-                        'Add'
-                    )
-                )
-            );
-        }
-    }]);
-
-    return IssueAdd;
 }(React.Component);
 
 // 改写为无状态组件
